@@ -92,6 +92,17 @@ export async function scaffoldAngularProject(projectDir, req) {
     console.warn('[od-angular] overlay failed:', err.message);
   }
 
+  // 3. Track changes in git if the project has a .git directory.
+  try {
+    const isGitRepo = await stat(path.join(projectDir, '.git')).then(() => true).catch(() => false);
+    if (isGitRepo) {
+      await runCommand('git', ['add', '.'], { cwd: projectDir });
+      console.log(`[od-angular] staged files in git repo at ${projectDir}`);
+    }
+  } catch (err) {
+    console.warn('[od-angular] git add failed:', err.message);
+  }
+
   return { ok: true, entryFile: 'src/index.html', angularVersion };
 }
 

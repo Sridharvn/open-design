@@ -112,7 +112,7 @@ import {
   shouldUrlLoadHtmlPreview,
   type UrlLoadDecision,
 } from './file-viewer-render-mode';
-import { saveTemplate } from '../state/projects';
+import { saveTemplate, pickLocalFolderPath } from '../state/projects';
 import type {
   LiveArtifactEventItem,
   LiveArtifact,
@@ -10313,15 +10313,20 @@ function HtmlViewer({
                     role="menuitem"
                     onClick={async () => {
                       setDownloadMenuOpen(false);
-                      // Scaffold the angular app via daemon API
                       try {
+                        const targetDir = await pickLocalFolderPath();
+                        if (!targetDir) return;
+                        // Scaffold the angular app via daemon API
                         const res = await fetch(`/api/angular/${encodeURIComponent(projectId)}/scaffold`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ appName: 'angular-extraction-ui' })
+                          body: JSON.stringify({ 
+                            appName: 'angular-extraction-ui',
+                            targetDir: targetDir
+                          })
                         });
                         if (res.ok) {
-                          alert('Successfully scaffolded Angular extraction UI in the project directory!');
+                          alert('Successfully scaffolded Angular extraction UI in the selected folder!');
                         } else {
                           const err = await res.json();
                           const msg = err.error?.message || err.message || JSON.stringify(err);

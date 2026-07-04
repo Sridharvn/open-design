@@ -54,7 +54,10 @@ export function registerAngularRoutes(app, deps) {
       const skipGit = body.skipGit === true;
       const installSkills = body.installSkills !== false; // default: true
 
-      const projectDir = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata);
+      let projectDir = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata);
+      if (body.targetDir && typeof body.targetDir === 'string' && body.targetDir.trim()) {
+        projectDir = body.targetDir.trim();
+      }
 
       // Run ng new + overlays
       const scaffoldResult = await scaffoldAngularProject(projectDir, {
