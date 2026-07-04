@@ -10324,7 +10324,8 @@ function HtmlViewer({
                           alert('Successfully scaffolded Angular extraction UI in the project directory!');
                         } else {
                           const err = await res.json();
-                          alert('Failed to scaffold Angular app: ' + err.message);
+                          const msg = err.error?.message || err.message || JSON.stringify(err);
+                          alert('Failed to scaffold Angular app: ' + msg);
                         }
                       } catch (e: any) {
                         alert('Error scaffolding Angular app: ' + e.message);
