@@ -54,19 +54,27 @@ export async function scaffoldAngularProject(projectDir, req) {
   let angularVersion;
   try {
     await fs.promises.mkdir(projectDir, { recursive: true });
-    await runCommand('npx', [
-      '--yes',
-      '@angular/cli@21',
-      'new',
-      appName,
-      '--directory', '.',
-      '--standalone',
-      `--style=${style}`,
-      '--routing',
-      '--skip-git',
-      '--skip-install',
-      '--no-interactive',
-    ], { cwd: projectDir, timeout: 300_000 });
+    
+    // Check if it's already an angular workspace
+    const isWorkspace = await stat(path.join(projectDir, 'angular.json')).then(() => true).catch(() => false);
+    
+    if (!isWorkspace) {
+      await runCommand('npx', [
+        '--yes',
+        '@angular/cli@21',
+        'new',
+        appName,
+        '--directory', '.',
+        '--standalone',
+        `--style=${style}`,
+        '--routing',
+        '--skip-git',
+        '--skip-install',
+        '--no-interactive',
+      ], { cwd: projectDir, timeout: 300_000 });
+    } else {
+      console.log('[od-angular] Project is already an Angular workspace, skipping ng new');
+    }
 
     // Detect installed Angular CLI version from package.json
     const pkgRaw = await readFile(path.join(projectDir, 'package.json'), 'utf8').catch(() => '{}');
