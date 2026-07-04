@@ -112,7 +112,7 @@ const DESIGN_PLATFORMS: Array<{
   },
 ];
 
-export type CreateTab = 'prototype' | 'live-artifact' | 'deck' | 'template' | 'media' | 'other';
+export type CreateTab = 'angular' | 'prototype' | 'live-artifact' | 'deck' | 'template' | 'media' | 'other';
 export type MediaSurface = 'image' | 'video' | 'audio';
 
 export interface CreateInput {
@@ -121,6 +121,7 @@ export interface CreateInput {
   designSystemId: string | null;
   metadata: ProjectMetadata;
   userWorkingDirToken?: string;
+  isAngularScaffold?: boolean;
 }
 
 export type ImportClaudeDesignOutcome =
@@ -156,6 +157,7 @@ interface Props {
 }
 
 const TAB_LABEL_KEYS: Record<CreateTab, keyof Dict> = {
+  angular: 'newproj.tabAngular',
   prototype: 'newproj.tabPrototype',
   'live-artifact': 'newproj.tabLiveArtifact',
   deck: 'newproj.tabDeck',
@@ -172,6 +174,7 @@ function newProjectTabToApplyKind(
   tab: CreateTab,
 ): TrackingDesignSystemApplyTargetKind {
   switch (tab) {
+    case 'angular':
     case 'prototype':
       return 'prototype';
     case 'deck':
@@ -722,6 +725,7 @@ export function NewProjectPanel({
         ...(workingDir ? { userWorkingDir: workingDir } : {}),
       },
       ...(workingDirToken ? { userWorkingDirToken: workingDirToken } : {}),
+      isAngularScaffold: tab === 'angular',
       requestId,
     });
   }
@@ -1050,6 +1054,8 @@ export function NewProjectPanel({
               ? t('newproj.createFromTemplate')
               : tab === 'live-artifact'
                 ? t('newproj.createLiveArtifact')
+              : tab === 'angular'
+                ? t('newproj.createAngular')
               : t('newproj.create')}
           </span>
         </button>

@@ -96,6 +96,7 @@ import {
   listTemplates,
   deleteTemplate,
   patchProject,
+  pickLocalFolderPath,
 } from './state/projects';
 import { useModalWindowDragGuard } from './hooks/useModalWindowDragGuard';
 import type {
@@ -136,6 +137,7 @@ type AppCreateProjectInput = Omit<CreateInput, 'metadata'> & {
   pendingFiles?: File[];
   userWorkingDirToken?: string;
   linkedDirs?: string[] | null;
+  isAngularScaffold?: boolean;
 };
 
 const APP_CONFIG_CHANGED_EVENT = 'open-design:app-config-changed';
@@ -1392,6 +1394,32 @@ function AppInner() {
         kind === 'template' ? 'template' : 'blank';
       let result;
       try {
+        if (input.isAngularScaffold) {
+          const targetDir = await pickLocalFolderPath();
+          if (!targetDir) return false;
+
+          const imported = await importFolderProject({ baseDir: targetDir });
+          rememberLocalProject(imported.project.id);
+          
+          const res = await fetch(`/api/angular/${imported.project.id}/scaffold`, {
+            method: 'POST',
+            body: JSON.stringify({ targetDir }),
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          if (!res.ok) {
+            throw new Error(`Failed to scaffold angular app: ${res.statusText}`);
+          }
+
+          setProjects((curr) => [imported.project, ...curr.filter((p) => p.id !== imported.project.id)]);
+          navigate({
+            kind: 'project',
+            projectId: imported.project.id,
+            fileName: null,
+          });
+          return true;
+        }
+
         result = await createProject({
           name: input.name,
           skillId: input.skillId,

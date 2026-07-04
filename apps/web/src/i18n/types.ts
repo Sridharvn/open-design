@@ -1889,6 +1889,7 @@ export interface Dict {
   'connectors.emptyNoMatchAction': string;
 
   // New project panel
+  'newproj.tabAngular': string;
   'newproj.tabPrototype': string;
   'newproj.tabLiveArtifact': string;
   'newproj.tabDeck': string;
@@ -1939,6 +1940,7 @@ export interface Dict {
   'newproj.fileSingular': string;
   'newproj.filePlural': string;
   'newproj.create': string;
+  'newproj.createAngular': string;
   'newproj.locationLabel': string;
   'newproj.locationDefault': string;
   'newproj.locationExternalBase': string;
