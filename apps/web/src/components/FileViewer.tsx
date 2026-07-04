@@ -10307,6 +10307,33 @@ function HtmlViewer({
                     <span className="share-menu-icon"><RemixIcon name="file-code-line" size={15} /></span>
                     <span>{t('fileViewer.exportHtml')}</span>
                   </button>
+                  <button
+                    type="button"
+                    className="share-menu-item"
+                    role="menuitem"
+                    onClick={async () => {
+                      setDownloadMenuOpen(false);
+                      // Scaffold the angular app via daemon API
+                      try {
+                        const res = await fetch(`/api/angular/${encodeURIComponent(projectId)}/scaffold`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ appName: 'angular-extraction-ui' })
+                        });
+                        if (res.ok) {
+                          alert('Successfully scaffolded Angular extraction UI in the project directory!');
+                        } else {
+                          const err = await res.json();
+                          alert('Failed to scaffold Angular app: ' + err.message);
+                        }
+                      } catch (e: any) {
+                        alert('Error scaffolding Angular app: ' + e.message);
+                      }
+                    }}
+                  >
+                    <span className="share-menu-icon"><RemixIcon name="angularjs-fill" size={15} /></span>
+                    <span>Export as Angular App</span>
+                  </button>
                   {showMarkdownExport ? (
                     <button
                       type="button"
