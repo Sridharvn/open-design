@@ -966,7 +966,10 @@ export function registerProjectExportRoutes(app: Express, ctx: RegisterProjectEx
     if (!isExportFormat(format)) {
       return sendApiError(res, 400, 'BAD_REQUEST', 'invalid export format');
     }
-    await handleScreenshotExport(res, format, req.params.id, {
+    if (format === 'html') {
+      return sendApiError(res, 501, 'NOT_IMPLEMENTED', `${format} export via screenshot route is not supported`);
+    }
+    await handleScreenshotExport(res, format as 'pptx' | 'pdf' | 'image', req.params.id, {
       fileName,
       // pptx is deck-only (handleScreenshotExport forces it); pdf/image honor the
       // caller's deck flag when one is supplied. Omitted stays omitted so the

@@ -9,8 +9,9 @@
 // `pptx` is a slide-deck-only format (one screenshot slide per deck page); the
 // daemon rejects it for a non-deck artifact. It is served by the dedicated
 // `/export/pptx` route, and the generic `/export` route also accepts it.
-export const EXPORT_FORMATS = ['pdf', 'image', 'pptx'] as const;
+export const EXPORT_FORMATS = ['pdf', 'image', 'pptx', 'html'] as const;
 export type ExportFormat = (typeof EXPORT_FORMATS)[number];
+
 
 // Programmatic image export delegates to the desktop Electron renderer, whose
 // `nativeImage` encoder only supports PNG and JPEG. WebP is intentionally not

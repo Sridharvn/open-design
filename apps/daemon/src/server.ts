@@ -552,6 +552,8 @@ import { registerMediaRoutes } from './routes/media.js';
 import { registerProjectRoutes, registerProjectArtifactRoutes, registerProjectFileRoutes, registerProjectUploadRoutes } from './routes/project/index.js';
 import { registerVelaRoutes } from './routes/vela.js';
 import { registerFinalizeRoutes, registerImportRoutes, registerProjectExportRoutes } from './import-export-routes.js';
+import { registerAngularRoutes } from './angular-routes.js';
+
 import { registerHandoffRoutes } from './routes/handoff.js';
 import { EmptyTranscriptError, synthesizeHandoffPrompt } from './handoff-design.js';
 import { TranscriptExportLockedError } from './transcript-export.js';
@@ -4426,6 +4428,15 @@ export async function startServer({
     projectFiles: projectFileDeps,
     validation: validationDeps,
   });
+  registerAngularRoutes(app, {
+    db,
+    paths: { PROJECTS_DIR, USER_SKILLS_DIR },
+    projectStore: {
+      getProject,
+      resolveProjectDir: (dir, id, meta) => resolveProjectDir(dir, id, meta),
+    },
+  });
+
   registerProjectFileRoutes(app, {
     db,
     http: httpDeps,

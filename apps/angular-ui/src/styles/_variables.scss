@@ -1,0 +1,93 @@
+// Design token layer — dark-only, matching the architecture specification.
+// All tokens are CSS custom properties consumed by component styles.
+
+:root {
+  color-scheme: dark;
+
+  // Background hierarchy
+  --app-color-bg:              #0a0a0f;
+  --app-color-surface:         #12121a;
+  --app-color-surface-raised:  #1a1a26;
+  --app-color-surface-hover:   #1e1e30;
+  --app-color-glass:           rgba(255, 255, 255, 0.04);
+  --app-color-glass-hover:     rgba(255, 255, 255, 0.07);
+
+  // Borders
+  --app-color-border:          rgba(255, 255, 255, 0.08);
+  --app-color-border-strong:   rgba(255, 255, 255, 0.14);
+  --app-color-border-accent:   rgba(124, 106, 247, 0.35);
+
+  // Text
+  --app-color-text-primary:    rgba(255, 255, 255, 0.92);
+  --app-color-text-secondary:  rgba(255, 255, 255, 0.55);
+  --app-color-text-tertiary:   rgba(255, 255, 255, 0.35);
+  --app-color-text-disabled:   rgba(255, 255, 255, 0.25);
+
+  // Accent / brand
+  --app-color-accent:          #7c6af7;
+  --app-color-accent-hover:    #9585ff;
+  --app-color-accent-subtle:   rgba(124, 106, 247, 0.15);
+  --app-color-accent-muted:    rgba(124, 106, 247, 0.08);
+
+  // Semantic
+  --app-color-success:         #22c55e;
+  --app-color-success-subtle:  rgba(34, 197, 94, 0.12);
+  --app-color-warning:         #f59e0b;
+  --app-color-warning-subtle:  rgba(245, 158, 11, 0.12);
+  --app-color-error:           #ef4444;
+  --app-color-error-subtle:    rgba(239, 68, 68, 0.12);
+
+  // Gradients
+  --app-gradient-card-bg:      linear-gradient(135deg, #12121a 0%, #1e1930 100%);
+  --app-gradient-accent-glow:  radial-gradient(circle at 50% 0%, rgba(124, 106, 247, 0.18) 0%, transparent 70%);
+  --app-gradient-header:       linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.8) 100%);
+
+  // Spacing scale (4-point grid)
+  --app-spacing-1:  4px;
+  --app-spacing-2:  8px;
+  --app-spacing-3:  12px;
+  --app-spacing-4:  16px;
+  --app-spacing-5:  20px;
+  --app-spacing-6:  24px;
+  --app-spacing-8:  32px;
+  --app-spacing-10: 40px;
+  --app-spacing-12: 48px;
+  --app-spacing-16: 64px;
+
+  // Border radii
+  --app-border-radius-xs:  4px;
+  --app-border-radius-sm:  6px;
+  --app-border-radius-md:  12px;
+  --app-border-radius-lg:  20px;
+  --app-border-radius-xl:  28px;
+  --app-border-radius-full: 9999px;
+
+  // Typography
+  --app-font-family:       'Outfit', system-ui, -apple-system, sans-serif;
+  --app-font-family-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --app-font-size-xs:      0.6875rem;  // 11px
+  --app-font-size-sm:      0.8125rem;  // 13px
+  --app-font-size-md:      0.9375rem;  // 15px
+  --app-font-size-lg:      1.0625rem;  // 17px
+  --app-font-size-xl:      1.25rem;    // 20px
+  --app-font-size-2xl:     1.5rem;     // 24px
+  --app-font-size-3xl:     2rem;       // 32px
+
+  // Shadows
+  --app-shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --app-shadow-md:   0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --app-shadow-lg:   0 12px 32px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
+  --app-shadow-accent: 0 0 24px rgba(124, 106, 247, 0.25);
+
+  // Transitions
+  --app-transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --app-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --app-transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Z-index scale
+  --app-z-dropdown:  100;
+  --app-z-sticky:    200;
+  --app-z-overlay:   300;
+  --app-z-modal:     400;
+  --app-z-toast:     500;
+}

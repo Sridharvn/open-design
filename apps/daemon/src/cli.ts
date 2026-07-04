@@ -305,6 +305,206 @@ const PLUGIN_LIST_BOOLEAN_FLAGS = new Set([
   'bundled', 'no-bundled',
 ]);
 
+// ---------------------------------------------------------------------------
+// od angular — Angular 21 scaffold and development lifecycle
+// ---------------------------------------------------------------------------
+
+const ANGULAR_STRING_FLAGS = new Set([
+  'daemon-url', 'project', 'app-name', 'name', 'schematic', 'path', 'out',
+]);
+const ANGULAR_BOOLEAN_FLAGS = new Set([
+  'help', 'h', 'json', 'skip-git', 'skip-install-skills',
+]);
+
+function printAngularHelp() {
+  console.log(`Usage:
+  od angular <subcommand> [options]
+
+Manage Angular 21 projects using the canonical SignalStore architecture.
+
+Subcommands:
+  scaffold         Run ng new + apply architecture overlays + install skills
+  generate         Run ng generate inside an existing Angular workspace
+  install-skills   Install bundled skills-lock.json skills into Open Design
+  serve            Start ng serve for an Angular project
+  build            Run ng build for an Angular project
+  help             Show this help
+
+Options for scaffold:
+  --project <id>       Open Design project id (required)
+  --app-name <name>    Angular app name (default: project title)
+  --skip-git           Skip git init inside the workspace
+  --skip-install-skills  Do not auto-install skills-lock.json skills
+  --json               Machine-readable output
+
+Options for generate:
+  --project <id>       Open Design project id (required)
+  --schematic <s>      component | service | store | page | interceptor | guard | pipe | directive
+  --name <name>        Artifact name
+  --path <path>        Path inside src/app/ (optional)
+  --json               Machine-readable output
+
+Options for serve / build:
+  --project <id>       Open Design project id (required)
+
+Examples:
+  od angular scaffold --project p1 --app-name my-dashboard
+  od angular generate --project p1 --schematic component --name header --path components/header
+  od angular generate --project p1 --schematic store --name export --path stores
+  od angular serve --project p1
+  od angular build --project p1`);
+}
+
+async function runAngular(args) {
+  const sub = args.find((a) => !a.startsWith('-'));
+  if (!sub || sub === 'help' || args.includes('--help') || args.includes('-h')) {
+    printAngularHelp();
+    process.exit(sub ? 0 : 2);
+  }
+
+  let flags;
+  try {
+    flags = parseFlags(args, { string: ANGULAR_STRING_FLAGS, boolean: ANGULAR_BOOLEAN_FLAGS });
+  } catch (err) {
+    console.error(err.message);
+    process.exit(2);
+  }
+
+  const projectId = flags.project || process.env.OD_PROJECT_ID;
+  if (!projectId && sub !== 'help') {
+    console.error('--project <id> is required (or set OD_PROJECT_ID)');
+    process.exit(2);
+  }
+
+  const base = await cliDaemonBaseUrl(flags);
+
+  if (sub === 'scaffold') {
+    const body = {
+      appName: flags['app-name'] || undefined,
+      skipGit: flags['skip-git'] === true,
+      installSkills: flags['skip-install-skills'] !== true,
+    };
+    let resp;
+    try {
+      resp = await fetch(`${base}/api/angular/${encodeURIComponent(projectId)}/scaffold`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      surfaceFetchError(err, base);
+      process.exit(3);
+    }
+    if (!resp.ok) return structuredHttpFailure(resp);
+    const data = await resp.json();
+    if (flags.json) {
+      process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+    } else {
+      console.log(`✓ Angular workspace scaffolded at: ${data.resolvedDir}`);
+      if (data.angularVersion) console.log(`  Angular version: ${data.angularVersion}`);
+      if (data.skillsInstalled?.length) console.log(`  Skills installed: ${data.skillsInstalled.join(', ')}`);
+      if (data.skillsSkipped?.length)   console.log(`  Skills skipped (already present): ${data.skillsSkipped.join(', ')}`);
+      if (data.skillsFailed?.length)    console.warn(`  Skills failed: ${data.skillsFailed.join(', ')}`);
+      console.log('\nNext steps:');
+      console.log(`  cd <project-dir> && npm install && ng serve`);
+    }
+    return;
+  }
+
+  if (sub === 'generate') {
+    const schematic = flags.schematic;
+    const name = flags.name;
+    if (!schematic || !name) {
+      console.error('--schematic and --name are required for generate');
+      process.exit(2);
+    }
+    const body = {
+      schematic,
+      name,
+      path: flags.path || undefined,
+    };
+    let resp;
+    try {
+      resp = await fetch(`${base}/api/angular/${encodeURIComponent(projectId)}/generate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      surfaceFetchError(err, base);
+      process.exit(3);
+    }
+    if (!resp.ok) return structuredHttpFailure(resp);
+    const data = await resp.json();
+    if (flags.json) {
+      process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+    } else {
+      console.log(`✓ Generated ${schematic}: ${name}`);
+      for (const f of data.created ?? []) console.log(`  CREATE ${f}`);
+      for (const f of data.modified ?? []) console.log(`  UPDATE ${f}`);
+    }
+    return;
+  }
+
+  if (sub === 'install-skills') {
+    let resp;
+    try {
+      resp = await fetch(`${base}/api/angular/${encodeURIComponent(projectId)}/install-skills`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+      });
+    } catch (err) {
+      surfaceFetchError(err, base);
+      process.exit(3);
+    }
+    if (!resp.ok) return structuredHttpFailure(resp);
+    const data = await resp.json();
+    if (flags.json) {
+      process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+    } else {
+      console.log(`✓ Skills installation complete`);
+      if (data.skillsInstalled?.length) console.log(`  Installed: ${data.skillsInstalled.join(', ')}`);
+      if (data.skillsSkipped?.length)   console.log(`  Skipped (already present): ${data.skillsSkipped.join(', ')}`);
+      if (data.skillsFailed?.length)    console.warn(`  Failed: ${data.skillsFailed.join(', ')}`);
+    }
+    return;
+  }
+
+  if (sub === 'serve' || sub === 'build') {
+    // These run locally inside the project directory — not via the daemon.
+    // Resolve the project dir by calling the daemon for the project metadata
+    // then exec ng serve/build in that directory.
+    let resp;
+    try {
+      resp = await fetch(`${base}/api/projects/${encodeURIComponent(projectId)}`);
+    } catch (err) {
+      surfaceFetchError(err, base);
+      process.exit(3);
+    }
+    if (!resp.ok) return structuredHttpFailure(resp);
+    const project = await resp.json();
+    const projectDir = project?.project?.metadata?.baseDir || project?.metadata?.baseDir;
+    if (!projectDir) {
+      console.error('Could not resolve project directory from daemon response.');
+      process.exit(3);
+    }
+    const { spawnSync } = await import('node:child_process');
+    const cmd = sub === 'serve' ? 'ng' : 'ng';
+    const ngArgs = sub === 'serve' ? ['serve'] : ['build', '--configuration=production'];
+    console.log(`Running: npx ${cmd} ${ngArgs.join(' ')} in ${projectDir}`);
+    const result = spawnSync('npx', [cmd, ...ngArgs], {
+      cwd: projectDir,
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    });
+    process.exit(result.status ?? 1);
+  }
+
+  console.error(`Unknown od angular subcommand: ${sub}`);
+  printAngularHelp();
+  process.exit(2);
+}
+
 const SUBCOMMAND_MAP = {
   artifacts: runArtifacts,
   media: runMedia,
@@ -339,7 +539,9 @@ const SUBCOMMAND_MAP = {
   config: runConfig,
   library: runLibrary,
   figma: runFigma,
+  angular: runAngular,
 };
+
 
 const EXPORT_STRING_FLAGS = new Set([
   'daemon-url', 'project', 'format', 'out', 'output', 'image-format', 'title', 'file',

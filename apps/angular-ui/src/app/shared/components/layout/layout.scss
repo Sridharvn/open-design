@@ -1,0 +1,58 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--app-spacing-4) var(--app-spacing-6);
+  background: var(--app-gradient-header);
+  border-bottom: 1px solid var(--app-color-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  h1 {
+    font-size: var(--app-font-size-xl);
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--app-spacing-2);
+  }
+}
+
+nav {
+  display: flex;
+  gap: var(--app-spacing-4);
+
+  a {
+    color: var(--app-color-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--app-spacing-2) var(--app-spacing-4);
+    border-radius: var(--app-border-radius-md);
+    transition: all var(--app-transition-fast);
+
+    &:hover {
+      color: var(--app-color-text-primary);
+      background: var(--app-color-glass);
+    }
+
+    &.active {
+      color: var(--app-color-accent);
+      background: var(--app-color-accent-muted);
+    }
+  }
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--app-spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
