@@ -970,3 +970,37 @@ describe('NewProjectPanel template deletion', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 });
+
+describe('NewProjectPanel Angular Scaffolding', () => {
+  it('calls onCreate with isAngularScaffold when Angular App tab is submitted', async () => {
+    const onCreate = vi.fn();
+    render(
+      <NewProjectPanel
+        skills={skills}
+        designSystems={designSystems}
+        defaultDesignSystemId="clay"
+        templates={templates}
+        promptTemplates={[]}
+        onCreate={onCreate}
+      />,
+    );
+
+    // Click Angular App tab
+    fireEvent.click(screen.getByRole('tab', { name: /angular app/i }));
+
+    // Input project name
+    const nameInput = screen.getByPlaceholderText(/project name/i);
+    fireEvent.change(nameInput, { target: { value: 'my-angular-app' } });
+
+    // Click create button
+    const createButton = screen.getByRole('button', { name: /create angular app/i });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(onCreate).toHaveBeenCalledWith(expect.objectContaining({
+        name: 'my-angular-app',
+        isAngularScaffold: true,
+      }));
+    });
+  });
+});
